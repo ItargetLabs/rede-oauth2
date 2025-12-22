@@ -1,5 +1,5 @@
 {
-    "name": "pietrocoelho/erede-php-oauth",
+    "name": "devsitarget/sdk-erede-php-oauth",
     "description": "SDK PHP para integração com eRede utilizando autenticação OAuth 2.0",
     "type": "library",
     "license": "MIT",
