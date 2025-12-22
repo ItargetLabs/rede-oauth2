@@ -1,0 +1,54 @@
+# Dependências do Composer
+/vendor/
+composer.phar
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Arquivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos do sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Arquivos de build e cache
+/build/
+/cache/
+*.cache
+*.log
+*.tmp
+
+# Arquivos de teste e cobertura
+/phpunit.xml.bak
+.phpunit.result.cache
+/coverage/
+/.phpunit.cache/
+
+# Arquivos temporários
+*.bak
+*.swp
+*.tmp
+*.old
+
+# Arquivos de configuração local
+phpunit.local.xml
+phpstan.local.neon
+
