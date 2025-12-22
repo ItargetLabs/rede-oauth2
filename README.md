@@ -22,11 +22,11 @@ Este SDK possui as seguintes funcionalidades:
 
 ### Via Composer
 
-O pacote está disponível no [Packagist](https://packagist.org/packages/pietrocoelho/erede-php-oauth).
+O pacote está disponível no [Packagist](https://packagist.org/packages/devsitarget/sdk-erede-php-oauth).
 
 
 ```bash
-composer require pietrocoelho/erede-php-oauth
+composer require devsitarget/sdk-erede-php-oauth
 ```
 
 ### Via Docker
