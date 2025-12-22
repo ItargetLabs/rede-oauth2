@@ -1,11 +1,15 @@
 # Dependências do Composer
 /vendor/
 composer.phar
+composer.lock.bak
 
 # Arquivos de ambiente
 .env
 .env.local
 .env.*.local
+.env.backup
+.env.test
+.env.production
 
 # Arquivos de IDE
 .idea/
@@ -18,6 +22,9 @@ composer.phar
 .settings/
 *.sublime-project
 *.sublime-workspace
+.phpstorm.meta.php
+_ide_helper.php
+*.iml
 
 # Arquivos do sistema operacional
 .DS_Store
@@ -28,6 +35,7 @@ composer.phar
 ehthumbs.db
 Thumbs.db
 desktop.ini
+$RECYCLE.BIN/
 
 # Arquivos de build e cache
 /build/
@@ -35,20 +43,78 @@ desktop.ini
 *.cache
 *.log
 *.tmp
+*.pid
+*.seed
+*.pid.lock
 
 # Arquivos de teste e cobertura
 /phpunit.xml.bak
 .phpunit.result.cache
 /coverage/
 /.phpunit.cache/
+phpunit.xml.backup
+.phpunit.cache/
+*.coverage
+*.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+.pytest_cache/
 
 # Arquivos temporários
 *.bak
 *.swp
 *.tmp
 *.old
+*.orig
+*.rej
+*~
+*.swo
+*.swn
 
 # Arquivos de configuração local
 phpunit.local.xml
 phpstan.local.neon
+.php_cs.cache
+.php-cs-fixer.cache
+
+# Arquivos de sessão e upload
+/sessions/
+/uploads/
+/storage/
+/storage/*.key
+
+# Arquivos de Docker
+docker-compose.override.yml
+.dockerignore.local
+
+# Arquivos de backup e dump
+*.sql
+*.dump
+*.backup
+*.tar.gz
+*.zip
+!vendor/*.zip
+
+# Arquivos de análise estática
+.phpstan/
+.php-cs-fixer.cache
+.phpunit.result.cache
+
+# Arquivos de logs
+logs/
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de dependências do sistema
+node_modules/
+package-lock.json
+yarn.lock
+
+# Arquivos de configuração do editor
+.editorconfig.local
+*.code-workspace
 
