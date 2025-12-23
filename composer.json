@@ -17,12 +17,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Rede\\": "src/Rede/"
+            "RedeOAuth\\": "src/Rede/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Rede\\Tests\\": "tests/"
+            "RedeOAuth\\Tests\\": "tests/"
         }
     },
     "scripts": {

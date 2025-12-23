@@ -53,9 +53,9 @@ Configure as credenciais OAuth diretamente no código:
 
 ```php
 <?php
-use Rede\Store;
-use Rede\Environment;
-use Rede\OAuth\OAuthClient;
+use RedeOAuth\Store;
+use RedeOAuth\Environment;
+use RedeOAuth\OAuth\OAuthClient;
 
 // Configuração para sandbox
 $oauthClient = new OAuthClient('https://rl7-sandbox-api.useredecloud.com.br/oauth2/token');
@@ -72,9 +72,9 @@ $store = new Store('MERCHANT_ID', 'MERCHANT_KEY', Environment::production(), $oa
 
 ```php
 <?php
-use Rede\Store;
-use Rede\Environment;
-use Rede\OAuth\OAuthClient;
+use RedeOAuth\Store;
+use RedeOAuth\Environment;
+use RedeOAuth\OAuth\OAuthClient;
 
 // Configuração da loja com OAuth em modo sandbox
 $oauthClient = new OAuthClient('https://rl7-sandbox-api.useredecloud.com.br/oauth2/token');
@@ -89,11 +89,11 @@ $store = new Store('MERCHANT_ID', 'MERCHANT_KEY', Environment::production(), $oa
 
 ```php
 <?php
-use Rede\Store;
-use Rede\Environment;
-use Rede\Transaction;
-use Rede\eRede;
-use Rede\OAuth\OAuthClient;
+use RedeOAuth\Store;
+use RedeOAuth\Environment;
+use RedeOAuth\Transaction;
+use RedeOAuth\eRede;
+use RedeOAuth\OAuth\OAuthClient;
 
 // Configuração da loja
 $oauthClient = new OAuthClient('https://rl7-sandbox-api.useredecloud.com.br/oauth2/token');

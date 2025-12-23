@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Rede\Tests\Unit;
+namespace RedeOAuth\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Rede\Environment;
-use Rede\OAuth\OAuthClient;
-use Rede\Store;
+use RedeOAuth\Environment;
+use RedeOAuth\OAuth\OAuthClient;
+use RedeOAuth\Store;
 
 class StoreTest extends TestCase
 {

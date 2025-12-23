@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede\Tests\Unit\Http;
+namespace RedeOAuth\Tests\Unit\Http;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -10,11 +10,11 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Rede\Environment;
-use Rede\Http\AuthenticatedHttpClient;
-use Rede\OAuth\OAuthClient;
-use Rede\OAuth\Token;
-use Rede\Store;
+use RedeOAuth\Environment;
+use RedeOAuth\Http\AuthenticatedHttpClient;
+use RedeOAuth\OAuth\OAuthClient;
+use RedeOAuth\OAuth\Token;
+use RedeOAuth\Store;
 
 class AuthenticatedHttpClientTest extends TestCase
 {

@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Rede\Tests\Integration;
+namespace RedeOAuth\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Rede\Environment;
-use Rede\eRede;
-use Rede\OAuth\OAuthClient;
-use Rede\Store;
-use Rede\Transaction;
+use RedeOAuth\Environment;
+use RedeOAuth\eRede;
+use RedeOAuth\OAuth\OAuthClient;
+use RedeOAuth\Store;
+use RedeOAuth\Transaction;
 
 /**
  * Testes de integração reais com a API eRede
- * 
+ *
  * Para executar estes testes, configure as credenciais de sandbox:
  * - merchantId (client_id)
  * - merchantKey (client_secret)
- * 
+ *
  * @group integration
  * @group real-api
  */

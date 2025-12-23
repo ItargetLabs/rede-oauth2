@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
 /**
  * Representa informações IATA
@@ -26,4 +26,3 @@ class Iata
         ];
     }
 }
-

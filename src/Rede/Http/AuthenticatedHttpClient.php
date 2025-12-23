@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Rede\Http;
+namespace RedeOAuth\Http;
 
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Rede\OAuth\OAuthClientInterface;
-use Rede\OAuth\Token;
-use Rede\Store;
+use RedeOAuth\OAuth\OAuthClientInterface;
+use RedeOAuth\OAuth\Token;
+use RedeOAuth\Store;
 
 /**
  * Cliente HTTP autenticado com OAuth
@@ -79,7 +79,7 @@ class AuthenticatedHttpClient implements HttpClientInterface
                     $this->store->getFiliation(),
                     $this->store->getToken()
                 );
-            } catch (\Rede\OAuth\OAuthException $e) {
+            } catch (\RedeOAuth\OAuth\OAuthException $e) {
                 throw new HttpException('Erro ao obter token OAuth: ' . $e->getMessage(), 0, $e);
             }
         }

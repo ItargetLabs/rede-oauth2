@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Rede\Tests\Unit\OAuth;
+namespace RedeOAuth\Tests\Unit\OAuth;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Rede\OAuth\OAuthClient;
-use Rede\OAuth\OAuthException;
+use RedeOAuth\OAuth\OAuthClient;
+use RedeOAuth\OAuth\OAuthException;
 
 class OAuthClientTest extends TestCase
 {
@@ -65,4 +65,3 @@ class OAuthClientTest extends TestCase
         $oauthClient->getAccessToken('client_id', 'client_secret');
     }
 }
-

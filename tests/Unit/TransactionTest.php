@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Rede\Tests\Unit;
+namespace RedeOAuth\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Rede\CreditCard;
-use Rede\Device;
-use Rede\Iata;
-use Rede\Mcc;
-use Rede\SubMerchant;
-use Rede\ThreeDSecure;
-use Rede\Transaction;
-use Rede\Url;
+use RedeOAuth\CreditCard;
+use RedeOAuth\Device;
+use RedeOAuth\Iata;
+use RedeOAuth\Mcc;
+use RedeOAuth\SubMerchant;
+use RedeOAuth\ThreeDSecure;
+use RedeOAuth\Transaction;
+use RedeOAuth\Url;
 
 class TransactionTest extends TestCase
 {
@@ -40,7 +40,7 @@ class TransactionTest extends TestCase
             ->debitCard('5448280000000007', '235', '12', '2020', 'John Snow');
 
         $debitCard = $transaction->getDebitCard();
-        $this->assertInstanceOf(\Rede\DebitCard::class, $debitCard);
+        $this->assertInstanceOf(\RedeOAuth\DebitCard::class, $debitCard);
     }
 
     public function testCapture(): void

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
-use Rede\OAuth\OAuthClientInterface;
+use RedeOAuth\OAuth\OAuthClientInterface;
 
 /**
  * Representa uma loja/configuração da eRede
@@ -48,4 +48,3 @@ class Store
         return $this->oauthClient;
     }
 }
-

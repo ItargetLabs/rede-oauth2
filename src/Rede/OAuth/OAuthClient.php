@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede\OAuth;
+namespace RedeOAuth\OAuth;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;

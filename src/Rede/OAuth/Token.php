@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede\OAuth;
+namespace RedeOAuth\OAuth;
 
 /**
  * Representa um token OAuth
@@ -60,4 +60,3 @@ class Token
         return sprintf('%s %s', $this->tokenType, $this->accessToken);
     }
 }
-

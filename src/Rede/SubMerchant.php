@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
 /**
  * Representa um sub-merchant para MCC dinâmico
@@ -29,4 +29,3 @@ class SubMerchant
         ];
     }
 }
-

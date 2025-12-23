@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Rede\Tests\Unit\OAuth;
+namespace RedeOAuth\Tests\Unit\OAuth;
 
 use PHPUnit\Framework\TestCase;
-use Rede\OAuth\Token;
+use RedeOAuth\OAuth\Token;
 
 class TokenTest extends TestCase
 {
@@ -40,4 +40,3 @@ class TokenTest extends TestCase
         $this->assertEquals('Bearer access_token_123', $token->toAuthorizationHeader());
     }
 }
-

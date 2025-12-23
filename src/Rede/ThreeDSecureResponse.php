@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
 /**
  * Representa a resposta do 3DS Secure
@@ -35,4 +35,3 @@ class ThreeDSecureResponse
         return $this->parameters;
     }
 }
-

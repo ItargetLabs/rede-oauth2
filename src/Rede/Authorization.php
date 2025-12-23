@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
 /**
  * Representa a autorização de uma transação
@@ -56,4 +56,3 @@ class Authorization
         return $this->authorizationCode;
     }
 }
-

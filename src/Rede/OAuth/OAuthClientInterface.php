@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede\OAuth;
+namespace RedeOAuth\OAuth;
 
 /**
  * Interface para cliente OAuth
@@ -30,4 +30,3 @@ interface OAuthClientInterface
      */
     public function refreshToken(Token $token, string $clientId, string $clientSecret): Token;
 }
-

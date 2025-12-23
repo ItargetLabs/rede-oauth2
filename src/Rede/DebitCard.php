@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
 /**
  * Representa um cartão de débito
@@ -65,4 +65,3 @@ class DebitCard
         ];
     }
 }
-

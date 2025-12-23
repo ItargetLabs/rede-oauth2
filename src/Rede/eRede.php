@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
 use GuzzleHttp\Psr7\Request;
-use Rede\Http\AuthenticatedHttpClient;
-use Rede\Http\HttpClientInterface;
-use Rede\Http\HttpException;
-use Rede\OAuth\OAuthClient;
+use RedeOAuth\Http\AuthenticatedHttpClient;
+use RedeOAuth\Http\HttpClientInterface;
+use RedeOAuth\Http\HttpException;
+use RedeOAuth\OAuth\OAuthClient;
 
 /**
  * Cliente principal do SDK eRede

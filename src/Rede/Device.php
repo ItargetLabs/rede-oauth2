@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede;
+namespace RedeOAuth;
 
 /**
  * Representa informações do dispositivo para 3DS
@@ -48,4 +48,3 @@ class Device
         ];
     }
 }
-

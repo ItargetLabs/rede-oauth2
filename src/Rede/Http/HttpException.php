@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rede\Http;
+namespace RedeOAuth\Http;
 
 use Exception;
 
@@ -12,4 +12,3 @@ use Exception;
 class HttpException extends Exception
 {
 }
-
