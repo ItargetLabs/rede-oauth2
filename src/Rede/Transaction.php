@@ -9,7 +9,7 @@ namespace RedeOAuth;
  */
 class Transaction
 {
-    private int|float $amount;
+    private ?int $amount = null;
     private string $reference;
     private ?string $tid = null;
     private ?CreditCard $creditCard = null;
@@ -24,22 +24,18 @@ class Transaction
     private array $urls = [];
     private ?string $softDescriptor = null;
 
-    public function __construct(int|float $amount, string $reference = '')
+    public function __construct(int|float|null $amount = null, string $reference = '')
     {
-        $this->amount = $amount;
+        if ($amount !== null) {
+            $this->amount = (int) round($amount * 100);
+        }
 
-        // Se a referência foi fornecida, sanitiza e valida
         if (!empty($reference)) {
-            // Remove caracteres especiais e mantém apenas alfanumérico
-            // A API eRede aceita apenas alfanumérico na referência
             $this->reference = preg_replace('/[^a-zA-Z0-9]/', '', $reference);
-
-            // Valida o tamanho máximo (geralmente 16 caracteres para eRede)
             if (strlen($this->reference) > 16) {
                 $this->reference = substr($this->reference, 0, 16);
             }
         } else {
-            // Para captura/cancelamento, a referência não é necessária
             $this->reference = '';
         }
     }
@@ -133,7 +129,7 @@ class Transaction
         return $this;
     }
 
-    public function getAmount(): float
+    public function getAmount(): ?int
     {
         return $this->amount;
     }
@@ -201,7 +197,7 @@ class Transaction
     public function toArray(): array
     {
         $data = [
-            'amount' => (int) round($this->amount * 100),
+            'amount' => $this->amount,
             'capture' => $this->capture,
         ];
 
@@ -209,7 +205,6 @@ class Transaction
             $data['reference'] = $this->reference;
         }
 
-        // Dados do cartão no nível raiz (formato correto da API eRede)
         if ($this->creditCard !== null) {
             $data['kind'] = 'credit';
             $data['cardNumber'] = $this->creditCard->getCardNumber();

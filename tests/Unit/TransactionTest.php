@@ -19,8 +19,7 @@ class TransactionTest extends TestCase
     public function testTransactionCreation(): void
     {
         $transaction = new Transaction(20.99, 'pedido123');
-
-        $this->assertEquals(20.99, $transaction->getAmount());
+        $this->assertEquals(2099, $transaction->getAmount());
         $this->assertEquals('pedido123', $transaction->getReference());
         $this->assertTrue($transaction->isCapture());
     }

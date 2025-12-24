@@ -15,6 +15,7 @@ class TransactionResponse
     private ?Authorization $authorization = null;
     private ?ThreeDSecureResponse $threeDSecure = null;
     private ?string $returnCode = null;
+    private ?string $refundId = null;
     private ?string $returnMessage = null;
     private ?string $dateTime = null;
     private ?int $installments = null;
@@ -23,12 +24,8 @@ class TransactionResponse
 
     public function __construct(array $data)
     {
-        // A API pode retornar dados de duas formas:
-        // 1. Criação: dados no nível raiz
-        // 2. Consulta: dados dentro de um objeto 'authorization'
 
         if (isset($data['authorization']) && is_array($data['authorization'])) {
-            // Formato de consulta (get) - dados dentro de authorization
             $authData = $data['authorization'];
             $this->tid = $authData['tid'] ?? null;
             $this->reference = $authData['reference'] ?? null;
@@ -42,10 +39,10 @@ class TransactionResponse
 
             $this->authorization = new Authorization($authData);
         } else {
-            // Formato de criação - dados no nível raiz
             $this->tid = $data['tid'] ?? null;
             $this->reference = $data['reference'] ?? null;
             $this->amount = isset($data['amount']) ? (int) $data['amount'] : null;
+            $this->refundId = isset($data['refundId']) ? (string) $data['refundId'] : null;
             $this->returnCode = $data['returnCode'] ?? null;
             $this->returnMessage = $data['returnMessage'] ?? null;
             $this->dateTime = $data['dateTime'] ?? null;
@@ -140,5 +137,10 @@ class TransactionResponse
     public function getLast4(): ?string
     {
         return $this->last4;
+    }
+
+    public function getRefundId(): ?string
+    {
+        return $this->refundId;
     }
 }

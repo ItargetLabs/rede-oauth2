@@ -2,6 +2,7 @@
     "name": "devsitarget/sdk-erede-php-oauth",
     "description": "SDK PHP para integração com eRede utilizando autenticação OAuth 2.0",
     "type": "library",
+    "version": "2.1.0",
     "license": "MIT",
     "require": {
         "php": ">=8.1",
