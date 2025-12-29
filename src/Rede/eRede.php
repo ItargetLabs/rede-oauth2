@@ -80,8 +80,11 @@ class eRede
             }
 
             $url = $this->store->getEnvironment()->getApiUrl() . '/v2/transactions/' . $transaction->getTid();
+
+            // O amount já está em centavos (armazenado assim no Transaction)
+            // Não precisa multiplicar por 100 novamente
             $body = json_encode([
-                'amount' => (int) round($transaction->getAmount() * 100),
+                'amount' => $transaction->getAmount(),
             ]);
 
             $request = new Request('PUT', $url, [], $body);
@@ -120,11 +123,15 @@ class eRede
             }
 
             $url = $this->store->getEnvironment()->getApiUrl() . '/v2/transactions/' . $transaction->getTid() . '/refunds';
-            $body = json_encode([
-                'amount' => $transaction->getAmount() > 0
-                    ? (int) round($transaction->getAmount() * 100)
-                    : null,
-            ]);
+
+            // O amount já está em centavos (armazenado assim no Transaction)
+            // Se amount for null ou 0, cancela o valor total (não envia o campo)
+            $bodyData = [];
+            if ($transaction->getAmount() !== null && $transaction->getAmount() > 0) {
+                $bodyData['amount'] = $transaction->getAmount();
+            }
+
+            $body = json_encode($bodyData);
 
             $request = new Request('POST', $url, [], $body);
             $response = $this->httpClient->send($request);
