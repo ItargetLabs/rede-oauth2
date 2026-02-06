@@ -92,7 +92,7 @@ $store = new Store('MERCHANT_ID', 'MERCHANT_KEY', Environment::production(), $oa
 use RedeOAuth\Store;
 use RedeOAuth\Environment;
 use RedeOAuth\Transaction;
-use RedeOAuth\eRede;
+use RedeOAuth\ERede;
 use RedeOAuth\OAuth\OAuthClient;
 
 // Configuração da loja
@@ -109,7 +109,7 @@ $transaction = (new Transaction(20.99, 'pedido' . time()))->creditCard(
 )->capture(false);
 
 try {
-    $response = (new eRede($store))->create($transaction);
+    $response = (new ERede($store))->create($transaction);
     
     if ($response->getReturnCode() == '00') {
         printf("Transação autorizada com sucesso; tid=%s\n", $response->getTid());
@@ -135,7 +135,7 @@ $transaction = (new Transaction(20.99, 'pedido' . time()))->creditCard(
     'John Snow'
 )->capture(true);
 
-$response = (new eRede($store))->create($transaction);
+$response = (new ERede($store))->create($transaction);
 
 if ($response->getReturnCode() == '00') {
     printf("Transação autorizada e capturada; tid=%s\n", $response->getTid());
@@ -154,7 +154,7 @@ $transaction = (new Transaction(100.00, 'pedido' . time()))->creditCard(
     'John Snow'
 )->setInstallments(3);
 
-$response = (new eRede($store))->create($transaction);
+$response = (new ERede($store))->create($transaction);
 
 if ($response->getReturnCode() == '00') {
     printf("Transação parcelada em %dx; tid=%s\n", $response->getInstallments(), $response->getTid());
@@ -173,7 +173,7 @@ $transaction = (new Transaction(20.99, 'pedido' . time()))->creditCard(
     'John Snow'
 )->additional(1234, 56);
 
-$response = (new eRede($store))->create($transaction);
+$response = (new ERede($store))->create($transaction);
 ```
 
 ### Capturando uma transação pré-autorizada
@@ -189,11 +189,11 @@ $transaction = (new Transaction(20.99, 'pedido' . time()))->creditCard(
     'John Snow'
 )->capture(false);
 
-$response = (new eRede($store))->create($transaction);
+$response = (new ERede($store))->create($transaction);
 
 // Depois captura usando o TID
 $captureTransaction = (new Transaction(20.99))->setTid($response->getTid());
-$captureResponse = (new eRede($store))->capture($captureTransaction);
+$captureResponse = (new ERede($store))->capture($captureTransaction);
 
 if ($captureResponse->getReturnCode() == '00') {
     printf("Transação capturada com sucesso; tid=%s\n", $captureResponse->getTid());
@@ -206,7 +206,7 @@ if ($captureResponse->getReturnCode() == '00') {
 <?php
 // Cancela uma transação usando o TID
 $cancelTransaction = (new Transaction(20.99))->setTid('TID123');
-$cancelResponse = (new eRede($store))->cancel($cancelTransaction);
+$cancelResponse = (new ERede($store))->cancel($cancelTransaction);
 
 if ($cancelResponse->getReturnCode() == '359') {
     printf("Transação cancelada com sucesso; tid=%s\n", $cancelResponse->getTid());
@@ -217,7 +217,7 @@ if ($cancelResponse->getReturnCode() == '359') {
 
 ```php
 <?php
-$response = (new eRede($store))->get('TID123');
+$response = (new ERede($store))->get('TID123');
 
 printf("Status: %s\n", $response->getAuthorization()->getStatus());
 printf("TID: %s\n", $response->getTid());
@@ -229,7 +229,7 @@ printf("Código de autorização: %s\n", $response->getAuthorization()->getAutho
 
 ```php
 <?php
-$response = (new eRede($store))->getByReference('pedido123');
+$response = (new ERede($store))->getByReference('pedido123');
 
 printf("Status: %s\n", $response->getAuthorization()->getStatus());
 printf("TID: %s\n", $response->getTid());
@@ -239,7 +239,7 @@ printf("TID: %s\n", $response->getTid());
 
 ```php
 <?php
-$refundsResponse = (new eRede($store))->getRefunds('TID123');
+$refundsResponse = (new ERede($store))->getRefunds('TID123');
 
 // Processa os cancelamentos retornados
 // Nota: A estrutura de refunds pode variar conforme a resposta da API
@@ -299,7 +299,7 @@ rede-auth/
 │       ├── OAuth/          # Autenticação OAuth 2.0
 │       ├── Http/           # Cliente HTTP autenticado
 │       ├── Transaction.php # Modelo de transação
-│       ├── eRede.php      # Cliente principal do SDK
+│       ├── ERede.php      # Cliente principal do SDK
 │       └── ...
 ├── tests/
 │   ├── Unit/              # Testes unitários

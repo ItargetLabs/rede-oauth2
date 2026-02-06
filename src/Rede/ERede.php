@@ -13,7 +13,7 @@ use RedeOAuth\OAuth\OAuthClient;
 /**
  * Cliente principal do SDK eRede
  */
-class eRede
+class ERede
 {
     private Store $store;
     private HttpClientInterface $httpClient;
@@ -52,8 +52,9 @@ class eRede
 
             if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
                 $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
+                $errorCode = $responseData['returnCode'] ?? null;
                 throw new HttpException(
-                    'Erro ao criar transação: ' . $errorMessage,
+                    $errorCode . ' - ' . $errorMessage,
                     $response->getStatusCode()
                 );
             }
@@ -81,8 +82,6 @@ class eRede
 
             $url = $this->store->getEnvironment()->getApiUrl() . '/v2/transactions/' . $transaction->getTid();
 
-            // O amount já está em centavos (armazenado assim no Transaction)
-            // Não precisa multiplicar por 100 novamente
             $body = json_encode([
                 'amount' => $transaction->getAmount(),
             ]);
@@ -122,10 +121,9 @@ class eRede
                 throw new HttpException('TID é obrigatório para cancelamento');
             }
 
-            $url = $this->store->getEnvironment()->getApiUrl() . '/v2/transactions/' . $transaction->getTid() . '/refunds';
+            $baseUrl = $this->store->getEnvironment()->getApiUrl();
+            $url = $baseUrl . '/v2/transactions/' . $transaction->getTid() . '/refunds';
 
-            // O amount já está em centavos (armazenado assim no Transaction)
-            // Se amount for null ou 0, cancela o valor total (não envia o campo)
             $bodyData = [];
             if ($transaction->getAmount() !== null && $transaction->getAmount() > 0) {
                 $bodyData['amount'] = $transaction->getAmount();
@@ -210,7 +208,6 @@ class eRede
                 );
             }
 
-            // Se retornar uma lista, pega o primeiro item
             if (isset($responseData[0])) {
                 $responseData = $responseData[0];
             }

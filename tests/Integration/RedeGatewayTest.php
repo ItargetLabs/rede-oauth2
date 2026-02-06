@@ -6,7 +6,7 @@ namespace RedeOAuth\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use RedeOAuth\Environment;
-use RedeOAuth\eRede;
+use RedeOAuth\ERede;
 use RedeOAuth\OAuth\OAuthClient;
 use RedeOAuth\Store;
 use RedeOAuth\Transaction;
@@ -24,7 +24,7 @@ use RedeOAuth\Transaction;
 class RedeGatewayTest extends TestCase
 {
     private Store $store;
-    private eRede $erede;
+    private ERede $erede;
 
     protected function setUp(): void
     {
@@ -48,7 +48,7 @@ class RedeGatewayTest extends TestCase
             Environment::sandbox(),
             $oauthClient
         );
-        $this->erede = new eRede($this->store);
+        $this->erede = new ERede($this->store);
     }
 
     /**
@@ -79,7 +79,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->capture(false);
@@ -104,7 +104,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->capture(true);
@@ -125,7 +125,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->setInstallments(3)
@@ -149,7 +149,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->capture(true);
@@ -178,7 +178,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->capture(true);
@@ -206,7 +206,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->capture(false);
@@ -234,7 +234,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->capture(true);
@@ -265,7 +265,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->setSoftDescriptor('Loja X');
@@ -285,7 +285,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->additional(1234, 56);
@@ -305,7 +305,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->mcc(
@@ -333,7 +333,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->iata('101010', '250');
@@ -353,7 +353,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             );
 
@@ -372,7 +372,7 @@ class RedeGatewayTest extends TestCase
                 '5277696455399733',
                 '123',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             );
 
@@ -403,8 +403,8 @@ class RedeGatewayTest extends TestCase
 
 
     /**
- * Testa a consulta de cancelamentos (refunds) de uma transação
- * (desenvolvimento em andamento)
+     * Testa a consulta de cancelamentos (refunds) de uma transação
+     * (desenvolvimento em andamento)
     public function testConsultTransactionRefunds(): void
     {
         // Primeiro cria uma transação
@@ -413,7 +413,7 @@ class RedeGatewayTest extends TestCase
                 '5448280000000007',
                 '235',
                 '12',
-                '2025',
+                date('Y'),
                 'JOHN SNOW'
             )
             ->capture(true);
@@ -437,5 +437,5 @@ class RedeGatewayTest extends TestCase
         $this->assertNotNull($refundsResponse);
         $this->assertNotNull($refundsResponse->getReturnCode());
     }
- */
+     */
 }
