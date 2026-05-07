@@ -23,6 +23,10 @@ class Transaction
     private ?ThreeDSecure $threeDSecure = null;
     private array $urls = [];
     private ?string $softDescriptor = null;
+    private ?string $tokenCryptogram = null;
+    private ?int $storageCard = null;
+    private ?string $sai = null;
+    private ?string $credentialId = null;
 
     public function __construct(int|float|null $amount = null, string $reference = '')
     {
@@ -89,6 +93,27 @@ class Transaction
     public function setSoftDescriptor(string $softDescriptor): self
     {
         $this->softDescriptor = $softDescriptor;
+        return $this;
+    }
+
+    /**
+     * Configura os campos para transação com token de bandeira (Card Brands Tokenization).
+     *
+     * @param string $tokenCryptogram Criptograma gerado pela bandeira para o token
+     * @param int    $storageCard     0 = não armazenado, 1 = primeiro armazenamento, 2 = já armazenado
+     * @param string|null $sai        ECI obrigatório para Visa e ELO em transações tokenizadas
+     * @param string|null $credentialId Identificador de credencial (Mastercard, obrigatório quando storageCard=1 ou 2)
+     */
+    public function withBrandToken(
+        string $tokenCryptogram,
+        int $storageCard = 2,
+        ?string $sai = null,
+        ?string $credentialId = null
+    ): self {
+        $this->tokenCryptogram = $tokenCryptogram;
+        $this->storageCard = $storageCard;
+        $this->sai = $sai;
+        $this->credentialId = $credentialId;
         return $this;
     }
 
@@ -194,6 +219,26 @@ class Transaction
         return $this->urls;
     }
 
+    public function getTokenCryptogram(): ?string
+    {
+        return $this->tokenCryptogram;
+    }
+
+    public function getStorageCard(): ?int
+    {
+        return $this->storageCard;
+    }
+
+    public function getSai(): ?string
+    {
+        return $this->sai;
+    }
+
+    public function getCredentialId(): ?string
+    {
+        return $this->credentialId;
+    }
+
     public function toArray(): array
     {
         $data = [
@@ -252,6 +297,22 @@ class Transaction
 
         if (!empty($this->urls)) {
             $data['urls'] = array_map(fn(Url $url) => $url->toArray(), $this->urls);
+        }
+
+        if ($this->tokenCryptogram !== null) {
+            $data['tokenCryptogram'] = $this->tokenCryptogram;
+        }
+
+        if ($this->storageCard !== null) {
+            $data['storageCard'] = (string) $this->storageCard;
+        }
+
+        if ($this->sai !== null) {
+            $data['securityAuthentication'] = ['sai' => $this->sai];
+        }
+
+        if ($this->credentialId !== null) {
+            $data['transactionCredentials'] = ['credentialId' => $this->credentialId];
         }
 
         return $data;
