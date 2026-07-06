@@ -42,4 +42,16 @@ class TokenizationResponse
     {
         return $this->returnCode === '00';
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        return [
+            'returnCode' => $this->returnCode,
+            'returnMessage' => $this->returnMessage,
+            'tokenizationId' => $this->tokenizationId,
+        ];
+    }
 }

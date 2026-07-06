@@ -317,4 +317,38 @@ class Transaction
 
         return $data;
     }
+
+    /**
+     * Retorna os dados do request sem informações sensíveis do cartão.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        $data = SensitiveDataSanitizer::sanitize($this->toArray());
+
+        if ($this->creditCard !== null) {
+            $data['cardBin'] = substr(preg_replace('/\D/', '', $this->creditCard->getCardNumber()) ?? '', 0, 6);
+            $data['last4'] = substr(preg_replace('/\D/', '', $this->creditCard->getCardNumber()) ?? '', -4);
+            $data['brand'] = [
+                'name' => SensitiveDataSanitizer::detectBrand($this->creditCard->getCardNumber()),
+                'message' => null,
+            ];
+        }
+
+        if ($this->debitCard !== null) {
+            $data['cardBin'] = substr(preg_replace('/\D/', '', $this->debitCard->getCardNumber()) ?? '', 0, 6);
+            $data['last4'] = substr(preg_replace('/\D/', '', $this->debitCard->getCardNumber()) ?? '', -4);
+            $data['brand'] = [
+                'name' => SensitiveDataSanitizer::detectBrand($this->debitCard->getCardNumber()),
+                'message' => null,
+            ];
+        }
+
+        if ($this->tid !== null) {
+            $data['tid'] = $this->tid;
+        }
+
+        return $data;
+    }
 }

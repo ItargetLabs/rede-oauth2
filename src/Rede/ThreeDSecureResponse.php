@@ -34,4 +34,23 @@ class ThreeDSecureResponse
     {
         return $this->parameters;
     }
+
+    /**
+     * Retorna os dados de autenticação 3DS sem parâmetros sensíveis.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        $data = [
+            'url' => $this->url,
+            'method' => $this->method,
+        ];
+
+        if ($this->parameters !== null) {
+            $data['parameters'] = SensitiveDataSanitizer::sanitize($this->parameters);
+        }
+
+        return array_filter($data, static fn (mixed $value): bool => $value !== null);
+    }
 }

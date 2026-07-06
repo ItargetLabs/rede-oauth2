@@ -55,4 +55,19 @@ class Authorization
     {
         return $this->authorizationCode;
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        return array_filter([
+            'status' => $this->status,
+            'returnCode' => $this->returnCode,
+            'returnMessage' => $this->returnMessage,
+            'tid' => $this->tid,
+            'nsu' => $this->nsu,
+            'authorizationCode' => $this->authorizationCode,
+        ], static fn (mixed $value): bool => $value !== null && $value !== '');
+    }
 }

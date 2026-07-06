@@ -11,6 +11,7 @@ SDK de integração com a eRede utilizando autenticação OAuth 2.0 (client cred
 - Cancelamento de transações
 - Consulta por TID e por referência
 - Parcelamento
+- Logging e auditoria segura de transações (`TransactionDetails`, `toSafeArray()`)
 
 **Tokenização de Bandeira (`CardBrandTokenizationClient`)**
 - Criação de requisição de tokenização (`POST /token-service/oauth/v2/tokenization`)
@@ -166,6 +167,157 @@ printf("Autorização: %s\n", $response->getAuthorization()->getAuthorizationCod
 $response = (new ERede($store))->getByReference('pedido123');
 
 printf("TID: %s\n", $response->getTid());
+```
+
+---
+
+## Logging e Auditoria
+
+> **v3.2.0** — Suporte para inspecionar request, response, mensagens, códigos de erro, bandeira e autenticação 3DS **sem expor dados sensíveis** do cartão (PAN, CVV, criptograma, PaReq/CReq).
+
+O fluxo normal de pagamento **não é alterado**: a API continua recebendo `toArray()` com os dados completos. Os métodos abaixo são **opt-in** — use apenas quando precisar registrar ou exibir informações da transação.
+
+### Dados disponíveis
+
+| Campo | Disponível | Observação |
+|-------|------------|------------|
+| Request sanitizado | Sim | Valor, referência, parcelas, tipo, 3DS |
+| Response sanitizado | Sim | TID, NSU, status, autorização |
+| `returnCode` / `returnMessage` | Sim | Código e mensagem da Rede |
+| Bandeira do cartão | Sim | Nome e mensagem da bandeira |
+| BIN + últimos 4 dígitos | Sim | Sem número completo |
+| Autenticação 3DS | Sim | Device, URLs, redirect (parâmetros sensíveis ocultos) |
+| Tokenização | Sim | Via `toSafeArray()` nos DTOs de tokenização |
+
+### Dados que nunca aparecem
+
+| Campo | Como é exibido |
+|-------|----------------|
+| Número do cartão | `544828******0007` |
+| CVV | `***` |
+| Nome do portador | `John ***` |
+| Criptograma / token PAN | `[REDACTED]` |
+| PaReq / CReq (3DS) | `[REDACTED]` |
+| E-mail (tokenização) | `p***@exemplo.com` |
+
+### Registrar uma transação com sucesso
+
+```php
+<?php
+use RedeOAuth\Http\HttpException;
+use RedeOAuth\Transaction;
+use RedeOAuth\TransactionDetails;
+use RedeOAuth\ERede;
+
+$transaction = (new Transaction(20.99, 'pedido' . time()))
+    ->creditCard('5448280000000007', '235', '12', '2028', 'John Snow');
+
+try {
+    $response = (new ERede($store))->create($transaction);
+    $details  = TransactionDetails::fromTransaction($transaction, $response);
+
+    // Salvar em banco, enviar para log, exibir no painel...
+    $auditoria = $details->toArray();
+
+    printf("TID: %s\n", $auditoria['response']['tid']);
+    printf("Código: %s\n", $auditoria['returnCode']);
+    printf("Mensagem: %s\n", $auditoria['returnMessage']);
+    printf("Bandeira: %s\n", $auditoria['brand']['name']);
+
+} catch (HttpException $e) {
+    $details = TransactionDetails::fromException($e, $transaction->toSafeArray());
+    $auditoria = $details->toArray();
+
+    printf("Erro %s: %s\n", $auditoria['returnCode'], $auditoria['returnMessage']);
+}
+```
+
+### Acesso direto aos dados
+
+```php
+<?php
+$details = TransactionDetails::fromTransaction($transaction, $response);
+
+$details->getRequest();         // request sanitizado
+$details->getResponse();        // response sanitizado
+$details->getAuthentication();  // dados 3DS (request + response), ou null
+$details->getReturnCode();      // ex: "00", "51", "220"
+$details->getReturnMessage();   // mensagem da Rede
+$details->getBrand();           // ['name' => 'Mastercard', 'message' => null]
+```
+
+### Autenticação 3DS
+
+Quando a transação usa 3DS, `getAuthentication()` retorna o request (device + URLs de callback) e o response (URL de redirect, método, parâmetros sem dados sensíveis):
+
+```php
+<?php
+use RedeOAuth\Device;
+use RedeOAuth\Url;
+
+$transaction = (new Transaction(30.00, 'pedido3ds'))
+    ->debitCard('4111111111111111', '123', '06', '2029', 'Jane Doe')
+    ->threeDSecure(new Device(1, 'BROWSER', false, 'BR', 500, 500, 3))
+    ->addUrl('https://meusite.com/3ds/success', Url::THREE_D_SECURE_SUCCESS)
+    ->addUrl('https://meusite.com/3ds/failure', Url::THREE_D_SECURE_FAILURE);
+
+$response = (new ERede($store))->create($transaction);
+$details  = TransactionDetails::fromTransaction($transaction, $response);
+
+$auth = $details->getAuthentication();
+// $auth['request']  → device + urls
+// $auth['response'] → url, method, parameters (PaReq/CReq ocultos)
+```
+
+### Sanitizar request ou response individualmente
+
+Todos os DTOs principais expõem `toSafeArray()`:
+
+```php
+<?php
+// Pagamento
+$safeRequest  = $transaction->toSafeArray();
+$safeResponse = $response->toSafeArray();
+
+// Getters adicionais na response
+$response->getBrandName();    // bandeira (API ou detecção por BIN)
+$response->getBrandMessage();  // mensagem da bandeira
+$response->getRawData();      // JSON bruto da API (uso interno)
+
+// Tokenização
+$safeTokenRequest  = $tokenizationRequest->toSafeArray();
+$safeTokenResponse = $tokenQueryResponse->toSafeArray();
+$safeCryptogram    = $cryptogramResponse->toSafeArray();
+```
+
+### Erros estruturados (`HttpException`)
+
+A partir da v3.2.0, `HttpException` expõe os campos da API separadamente:
+
+```php
+<?php
+use RedeOAuth\Http\HttpException;
+
+try {
+    $response = (new ERede($store))->create($transaction);
+} catch (HttpException $e) {
+    $e->getReturnCode();    // ex: "51"
+    $e->getReturnMessage(); // ex: "Insufficient funds"
+    $e->getResponseBody();  // array com o JSON completo da API
+    $e->getCode();          // HTTP status (ex: 400)
+}
+```
+
+### Utilitário de sanitização
+
+Para sanitizar arrays customizados (ex.: antes de enviar ao Monolog):
+
+```php
+<?php
+use RedeOAuth\SensitiveDataSanitizer;
+
+$safe = SensitiveDataSanitizer::sanitize($dadosBrutos);
+$bandeira = SensitiveDataSanitizer::detectBrand('544828'); // "Mastercard"
 ```
 
 ---
@@ -405,6 +557,8 @@ rede-oauth2/
 │   ├── Environment.php           # URLs de sandbox e produção
 │   ├── Transaction.php           # Modelo de transação
 │   ├── TransactionResponse.php
+│   ├── TransactionDetails.php    # Agrega request + response + 3DS para auditoria
+│   ├── SensitiveDataSanitizer.php  # Mascara PAN, CVV, criptograma etc.
 │   ├── CreditCard.php
 │   ├── DebitCard.php
 │   └── ...
@@ -415,7 +569,8 @@ rede-oauth2/
 │   │   ├── Http/
 │   │   ├── OAuth/
 │   │   ├── StoreTest.php
-│   │   └── TransactionTest.php
+│   │   ├── TransactionTest.php
+│   │   └── TransactionDetailsTest.php      # Testes de logging/auditoria
 │   ├── Integration/
 │   │   ├── RedeGatewayTest.php             # Testes do gateway contra sandbox
 │   │   └── TokenizationIntegrationTest.php # Testes de tokenização contra sandbox

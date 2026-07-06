@@ -51,10 +51,8 @@ class ERede
             $responseData = json_decode((string) $response->getBody(), true);
 
             if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
-                $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
-                $errorCode = $responseData['returnCode'] ?? null;
-                throw new HttpException(
-                    $errorCode . ' - ' . $errorMessage,
+                throw $this->buildHttpException(
+                    $responseData,
                     $response->getStatusCode()
                 );
             }
@@ -92,10 +90,10 @@ class ERede
             $responseData = json_decode((string) $response->getBody(), true);
 
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
-                throw new HttpException(
-                    'Erro ao capturar transação: ' . $errorMessage,
-                    $response->getStatusCode()
+                throw $this->buildHttpException(
+                    $responseData,
+                    $response->getStatusCode(),
+                    'Erro ao capturar transação: '
                 );
             }
 
@@ -136,10 +134,10 @@ class ERede
             $responseData = json_decode((string) $response->getBody(), true);
 
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
-                throw new HttpException(
-                    'Erro ao cancelar transação: ' . $errorMessage,
-                    $response->getStatusCode()
+                throw $this->buildHttpException(
+                    $responseData,
+                    $response->getStatusCode(),
+                    'Erro ao cancelar transação: '
                 );
             }
 
@@ -168,10 +166,10 @@ class ERede
             $responseData = json_decode((string) $response->getBody(), true);
 
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
-                throw new HttpException(
-                    'Erro ao consultar transação: ' . $errorMessage,
-                    $response->getStatusCode()
+                throw $this->buildHttpException(
+                    $responseData,
+                    $response->getStatusCode(),
+                    'Erro ao consultar transação: '
                 );
             }
 
@@ -201,10 +199,10 @@ class ERede
             $responseData = json_decode((string) $response->getBody(), true);
 
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
-                throw new HttpException(
-                    'Erro ao consultar transação: ' . $errorMessage,
-                    $response->getStatusCode()
+                throw $this->buildHttpException(
+                    $responseData,
+                    $response->getStatusCode(),
+                    'Erro ao consultar transação: '
                 );
             }
 
@@ -238,10 +236,10 @@ class ERede
             $responseData = json_decode((string) $response->getBody(), true);
 
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
-                throw new HttpException(
-                    'Erro ao consultar cancelamentos: ' . $errorMessage,
-                    $response->getStatusCode()
+                throw $this->buildHttpException(
+                    $responseData,
+                    $response->getStatusCode(),
+                    'Erro ao consultar cancelamentos: '
                 );
             }
 
@@ -251,5 +249,32 @@ class ERede
         } catch (\Exception $e) {
             throw new HttpException('Erro ao consultar cancelamentos: ' . $e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * @param array<string, mixed>|null $responseData
+     */
+    private function buildHttpException(
+        ?array $responseData,
+        int $statusCode,
+        string $prefix = ''
+    ): HttpException {
+        $errorMessage = $responseData['message'] ?? $responseData['returnMessage'] ?? 'Erro desconhecido';
+        $errorCode = isset($responseData['returnCode']) ? (string) $responseData['returnCode'] : null;
+
+        $message = $prefix;
+        if ($errorCode !== null) {
+            $message .= $errorCode . ' - ';
+        }
+        $message .= $errorMessage;
+
+        return new HttpException(
+            $message,
+            $statusCode,
+            null,
+            $errorCode,
+            $errorMessage,
+            $responseData
+        );
     }
 }

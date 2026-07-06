@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RedeOAuth\Tokenization;
 
+use RedeOAuth\SensitiveDataSanitizer;
+
 /**
  * Resposta da consulta de status de tokenização (GET /token-service/v1/tokenization/{tokenizationId}).
  *
@@ -110,5 +112,31 @@ class TokenQueryResponse
     public function isSuccess(): bool
     {
         return $this->returnCode === '00';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        return array_filter([
+            'returnCode' => $this->returnCode,
+            'returnMessage' => $this->returnMessage,
+            'tokenizationId' => $this->tokenizationId,
+            'tokenizationStatus' => $this->tokenizationStatus,
+            'affiliation' => $this->affiliation,
+            'lastModifiedDate' => $this->lastModifiedDate,
+            'last4' => $this->last4,
+            'brand' => [
+                'name' => $this->brandName,
+                'message' => $this->brandMessage,
+            ],
+            'token' => [
+                'code' => $this->tokenCode !== null
+                    ? SensitiveDataSanitizer::maskCardNumber($this->tokenCode)
+                    : null,
+                'expirationDate' => $this->tokenExpirationDate,
+            ],
+        ], static fn (mixed $value): bool => $value !== null);
     }
 }

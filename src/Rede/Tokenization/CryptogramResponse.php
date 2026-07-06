@@ -73,4 +73,19 @@ class CryptogramResponse
     {
         return $this->returnCode === '00';
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        return array_filter([
+            'returnCode' => $this->returnCode,
+            'returnMessage' => $this->returnMessage,
+            'tokenizationId' => $this->tokenizationId,
+            'eci' => $this->eci,
+            'expirationDate' => $this->expirationDate,
+            'tokenCryptogram' => $this->tokenCryptogram !== null ? '[REDACTED]' : null,
+        ], static fn (mixed $value): bool => $value !== null);
+    }
 }

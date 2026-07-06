@@ -21,9 +21,15 @@ class TransactionResponse
     private ?int $installments = null;
     private ?string $cardBin = null;
     private ?string $last4 = null;
+    private ?string $brandName = null;
+    private ?string $brandMessage = null;
+
+    /** @var array<string, mixed> */
+    private array $rawData;
 
     public function __construct(array $data)
     {
+        $this->rawData = $data;
 
         if (isset($data['authorization']) && is_array($data['authorization'])) {
             $authData = $data['authorization'];
@@ -64,6 +70,9 @@ class TransactionResponse
         if (isset($data['threeDSecure'])) {
             $this->threeDSecure = new ThreeDSecureResponse($data['threeDSecure']);
         }
+
+        $this->brandName = $data['brand']['name'] ?? $data['brandName'] ?? null;
+        $this->brandMessage = $data['brand']['message'] ?? $data['brandMessage'] ?? null;
     }
 
     /**
@@ -142,5 +151,61 @@ class TransactionResponse
     public function getRefundId(): ?string
     {
         return $this->refundId;
+    }
+
+    public function getBrandName(): ?string
+    {
+        return $this->brandName ?? SensitiveDataSanitizer::detectBrand($this->cardBin);
+    }
+
+    public function getBrandMessage(): ?string
+    {
+        return $this->brandMessage;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRawData(): array
+    {
+        return $this->rawData;
+    }
+
+    /**
+     * Retorna os dados da resposta sem informações sensíveis.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        $data = [
+            'tid' => $this->tid,
+            'reference' => $this->reference,
+            'amount' => $this->amount,
+            'returnCode' => $this->returnCode,
+            'returnMessage' => $this->returnMessage,
+            'dateTime' => $this->dateTime,
+            'installments' => $this->installments,
+            'cardBin' => $this->cardBin,
+            'last4' => $this->last4,
+            'refundId' => $this->refundId,
+            'brand' => [
+                'name' => $this->getBrandName(),
+                'message' => $this->brandMessage,
+            ],
+        ];
+
+        if ($this->authorization !== null) {
+            $data['authorization'] = $this->authorization->toSafeArray();
+        }
+
+        if ($this->threeDSecure !== null) {
+            $data['threeDSecure'] = $this->threeDSecure->toSafeArray();
+        }
+
+        return array_filter(
+            $data,
+            static fn (mixed $value): bool => $value !== null
+        );
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RedeOAuth\Tokenization;
 
+use RedeOAuth\SensitiveDataSanitizer;
+
 /**
  * Representa a requisição de tokenização de cartão pela bandeira via Rede.
  *
@@ -100,5 +102,13 @@ class TokenizationRequest
         }
 
         return $data;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSafeArray(): array
+    {
+        return SensitiveDataSanitizer::sanitize($this->toArray());
     }
 }
