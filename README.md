@@ -6,6 +6,7 @@ SDK de integração com a eRede utilizando autenticação OAuth 2.0 (client cred
 
 **Gateway de Pagamento (`ERede`)**
 - Autenticação OAuth 2.0 (client credentials)
+- Reuso e persistência do access token (`getAccessToken` / `setAccessToken`, `Token::toArray()` / `fromArray()`)
 - Autorização de transações de crédito e débito
 - Captura de transações pré-autorizadas
 - Cancelamento de transações
@@ -61,6 +62,50 @@ $store = new Store('MERCHANT_ID', 'MERCHANT_KEY', Environment::sandbox(), $oauth
 $oauthClient = new OAuthClient('https://api.userede.com.br/erede/oauth2/token');
 $store = new Store('MERCHANT_ID', 'MERCHANT_KEY', Environment::production(), $oauthClient);
 ```
+
+### Reuso do access token OAuth
+
+> **v3.3.0** — Evite solicitar um novo token a cada request: obtenha, persista (cache, Redis, sessão, etc.) e reinjete o access token em novas instâncias de `ERede` ou `CardBrandTokenizationClient`.
+
+Por padrão o SDK obtém o token automaticamente na primeira chamada. Com `getAccessToken()` / `setAccessToken()` você controla o ciclo de vida:
+
+```php
+<?php
+use RedeOAuth\ERede;
+use RedeOAuth\OAuth\Token;
+use RedeOAuth\Tokenization\CardBrandTokenizationClient;
+
+$erede = new ERede($store);
+
+// Obtém o token (gera um novo se ainda não existir ou estiver expirado)
+$token = $erede->getAccessToken();
+
+// Persiste para reutilizar em outros processos/requests
+$cache->set('rede_oauth_token', $token->toArray(), $token->getExpiresIn());
+```
+
+#### Restaurar um token do cache
+
+```php
+<?php
+$cached = $cache->get('rede_oauth_token');
+
+if ($cached !== null) {
+    $token = Token::fromArray($cached);
+
+    // Via construtor
+    $erede = new ERede($store, accessToken: $token);
+
+    // Ou depois da construção
+    $erede = new ERede($store);
+    $erede->setAccessToken($token);
+}
+
+// Mesma API no cliente de tokenização
+$client = new CardBrandTokenizationClient($store, accessToken: $token);
+```
+
+Se o token injetado estiver expirado (ou faltar menos de 60 segundos para expirar), o SDK solicita um novo automaticamente na próxima requisição. Em caso de `401`, o token é renovado e a requisição é reenviada.
 
 ---
 
@@ -539,7 +584,8 @@ rede-oauth2/
 │   ├── OAuth/                    # Autenticação OAuth 2.0
 │   │   ├── OAuthClient.php       # Obtém/renova tokens via client credentials
 │   │   ├── OAuthClientInterface.php
-│   │   ├── Token.php
+│   │   ├── ManagesAccessToken.php # Trait get/set access token (ERede + Tokenization)
+│   │   ├── Token.php             # Token + toArray()/fromArray() para cache
 │   │   └── OAuthException.php
 │   ├── Http/                     # Camada HTTP
 │   │   ├── AuthenticatedHttpClient.php  # Injeta Bearer token + trata 401

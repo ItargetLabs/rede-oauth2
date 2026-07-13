@@ -8,18 +8,25 @@ use GuzzleHttp\Psr7\Request;
 use RedeOAuth\Http\AuthenticatedHttpClient;
 use RedeOAuth\Http\HttpClientInterface;
 use RedeOAuth\Http\HttpException;
+use RedeOAuth\OAuth\ManagesAccessToken;
 use RedeOAuth\OAuth\OAuthClient;
+use RedeOAuth\OAuth\Token;
 
 /**
  * Cliente principal do SDK eRede
  */
 class ERede
 {
+    use ManagesAccessToken;
+
     private Store $store;
     private HttpClientInterface $httpClient;
 
-    public function __construct(Store $store, ?HttpClientInterface $httpClient = null)
-    {
+    public function __construct(
+        Store $store,
+        ?HttpClientInterface $httpClient = null,
+        ?Token $accessToken = null
+    ) {
         $this->store = $store;
 
         if ($httpClient === null) {
@@ -28,7 +35,9 @@ class ERede
                 $tokenEndpoint = $store->getEnvironment()->getApiUrl() . '/oauth2/token';
                 $oauthClient = new OAuthClient($tokenEndpoint);
             }
-            $httpClient = new AuthenticatedHttpClient($store, $oauthClient);
+            $httpClient = new AuthenticatedHttpClient($store, $oauthClient, null, $accessToken);
+        } elseif ($accessToken !== null && $httpClient instanceof AuthenticatedHttpClient) {
+            $httpClient->setAccessToken($accessToken);
         }
 
         $this->httpClient = $httpClient;

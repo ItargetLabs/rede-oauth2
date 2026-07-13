@@ -65,4 +65,40 @@ class AuthenticatedHttpClientTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+    public function testUsesProvidedAccessTokenWithoutCallingOAuth(): void
+    {
+        $token = new Token('provided_token', 'Bearer', 3600);
+        $mockOAuthClient = $this->createMock(OAuthClient::class);
+        $mockOAuthClient->expects($this->never())->method('getAccessToken');
+
+        $mockResponse = new Response(200, [], json_encode(['success' => true]));
+        $mockHandler = new MockHandler([$mockResponse]);
+        $handlerStack = HandlerStack::create($mockHandler);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $store = new Store('PV123', 'TOKEN123', Environment::production(), $mockOAuthClient);
+        $authenticatedClient = new AuthenticatedHttpClient($store, $mockOAuthClient, $httpClient, $token);
+
+        $request = new Request('GET', 'https://api.test.com/test');
+        $response = $authenticatedClient->send($request);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('provided_token', $authenticatedClient->getAccessToken()->getAccessToken());
+    }
+
+    public function testSetAccessTokenReplacesExistingToken(): void
+    {
+        $first = new Token('first_token', 'Bearer', 3600);
+        $second = new Token('second_token', 'Bearer', 3600);
+
+        $mockOAuthClient = $this->createMock(OAuthClient::class);
+        $mockOAuthClient->expects($this->never())->method('getAccessToken');
+
+        $store = new Store('PV123', 'TOKEN123', Environment::production(), $mockOAuthClient);
+        $authenticatedClient = new AuthenticatedHttpClient($store, $mockOAuthClient, null, $first);
+        $authenticatedClient->setAccessToken($second);
+
+        $this->assertSame('second_token', $authenticatedClient->getAccessToken()->getAccessToken());
+    }
 }

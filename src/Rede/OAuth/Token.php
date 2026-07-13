@@ -17,12 +17,48 @@ class Token
     public function __construct(
         string $accessToken,
         string $tokenType = 'Bearer',
-        int $expiresIn = 3600
+        int $expiresIn = 3600,
+        ?int $expiresAt = null
     ) {
         $this->accessToken = $accessToken;
         $this->tokenType = $tokenType;
         $this->expiresIn = $expiresIn;
-        $this->expiresAt = time() + $expiresIn;
+        $this->expiresAt = $expiresAt ?? (time() + $expiresIn);
+    }
+
+    /**
+     * Recria um token a partir de dados persistidos (cache, sessão, etc.).
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function fromArray(array $data): self
+    {
+        $accessToken = $data['access_token'] ?? null;
+        if (!is_string($accessToken) || $accessToken === '') {
+            throw new \InvalidArgumentException('access_token é obrigatório para recriar o Token');
+        }
+
+        return new self(
+            $accessToken,
+            isset($data['token_type']) && is_string($data['token_type']) ? $data['token_type'] : 'Bearer',
+            isset($data['expires_in']) ? (int) $data['expires_in'] : 3600,
+            isset($data['expires_at']) ? (int) $data['expires_at'] : null
+        );
+    }
+
+    /**
+     * Serializa o token para persistência externa.
+     *
+     * @return array{access_token: string, token_type: string, expires_in: int, expires_at: int|null}
+     */
+    public function toArray(): array
+    {
+        return [
+            'access_token' => $this->accessToken,
+            'token_type' => $this->tokenType,
+            'expires_in' => $this->expiresIn,
+            'expires_at' => $this->expiresAt,
+        ];
     }
 
     public function getAccessToken(): string

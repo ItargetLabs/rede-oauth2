@@ -26,11 +26,36 @@ class AuthenticatedHttpClient implements HttpClientInterface
     public function __construct(
         Store $store,
         OAuthClientInterface $oauthClient,
-        ?ClientInterface $httpClient = null
+        ?ClientInterface $httpClient = null,
+        ?Token $accessToken = null
     ) {
         $this->store = $store;
         $this->oauthClient = $oauthClient;
         $this->httpClient = $httpClient ?? new Client();
+        $this->token = $accessToken;
+    }
+
+    /**
+     * Define um access token previamente obtido.
+     */
+    public function setAccessToken(?Token $token): void
+    {
+        $this->token = $token;
+    }
+
+    /**
+     * Retorna o access token atual, gerando um novo se necessário.
+     *
+     * @throws HttpException
+     */
+    public function getAccessToken(): Token
+    {
+        $this->ensureValidToken();
+
+        /** @var Token $token */
+        $token = $this->token;
+
+        return $token;
     }
 
     /**
@@ -43,8 +68,8 @@ class AuthenticatedHttpClient implements HttpClientInterface
     public function send(RequestInterface $request): ResponseInterface
     {
         // Garante que temos um token válido
-        $this->ensureValidToken();
-        $request = $request->withHeader('Authorization', $this->token->toAuthorizationHeader());
+        $token = $this->getAccessToken();
+        $request = $request->withHeader('Authorization', $token->toAuthorizationHeader());
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withHeader('Accept', 'application/json');
 
@@ -54,8 +79,8 @@ class AuthenticatedHttpClient implements HttpClientInterface
             // Se receber 401, tenta renovar o token e reenvia
             if ($response->getStatusCode() === 401) {
                 $this->token = null;
-                $this->ensureValidToken();
-                $request = $request->withHeader('Authorization', $this->token->toAuthorizationHeader());
+                $token = $this->getAccessToken();
+                $request = $request->withHeader('Authorization', $token->toAuthorizationHeader());
                 $response = $this->httpClient->sendRequest($request);
             }
 
